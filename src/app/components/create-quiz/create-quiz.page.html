@@ -1,0 +1,254 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create Quiz</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="create-quiz-content">
+
+
+  <div class="create-quiz-container">
+    <!-- Progress Indicator -->
+    <div class="progress-section">
+      <div class="progress-item" [class.active]="true">
+        <div class="progress-icon">
+          <ion-icon name="document-text"></ion-icon>
+        </div>
+        <span>Details</span>
+      </div>
+      <div class="progress-line" [class.active]="questions.length > 0"></div>
+      <div class="progress-item" [class.active]="questions.length > 0">
+        <div class="progress-icon">
+          <ion-icon name="help-circle"></ion-icon>
+        </div>
+        <span>Questions</span>
+      </div>
+      <div class="progress-line" [class.active]="questions.length >= 3"></div>
+      <div class="progress-item" [class.active]="questions.length >= 3">
+        <div class="progress-icon">
+          <ion-icon name="checkmark-circle"></ion-icon>
+        </div>
+        <span>Finish</span>
+      </div>
+    </div>
+
+    <!-- Quiz Details Form -->
+    <ion-card class="quiz-details-card modern-card">
+      <ion-card-header>
+        <ion-card-title>📝 Quiz Information</ion-card-title>
+        <ion-card-subtitle>Give your quiz a catchy title and description</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="quizForm">
+          
+          <div class="form-group">
+            <ion-item lines="none" class="modern-item">
+              <ion-label position="stacked">Quiz Title *</ion-label>
+              <ion-input
+                formControlName="title"
+                placeholder="e.g., World History Quiz"
+                type="text"
+              ></ion-input>
+            </ion-item>
+          </div>
+
+          <div class="form-group">
+            <ion-item lines="none" class="modern-item">
+              <ion-label position="stacked">Description</ion-label>
+              <ion-textarea
+                formControlName="description"
+                placeholder="What's this quiz about?"
+                rows="3"
+                autoGrow="true"
+              ></ion-textarea>
+            </ion-item>
+          </div>
+
+        </form>
+      </ion-card-content>
+
+    </ion-card>
+
+    <!-- Questions Section -->
+    <ion-card class="questions-section modern-card">
+      <ion-card-header>
+        <div class="questions-header-top">
+          <div>
+            <ion-card-title>❓Questions</ion-card-title>
+            <ion-card-subtitle>Add at least 3 questions</ion-card-subtitle>
+          </div>
+          <div class="question-count-badge">
+            <span class="count">{{ questions.length }}</span>
+          </div>
+        </div>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <!-- Add Question Button (when form is hidden) -->
+        <ion-button
+          *ngIf="!showQuestionForm"
+          expand="block"
+          (click)="showQuestionForm = true"
+          class="add-question-btn"
+        >
+          <ion-icon slot="start" name="add-circle"></ion-icon>
+          Add New Question
+        </ion-button>
+
+        <!-- Add Question Form -->
+        <div *ngIf="showQuestionForm" class="question-form">
+          <div class="form-header">
+            <h3>New Question</h3>
+            <ion-button fill="clear" size="small" (click)="showQuestionForm = false">
+              <ion-icon name="close" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+
+          <form [formGroup]="questionForm">
+            <div class="form-group">
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Question *</ion-label>
+                <ion-textarea
+                  formControlName="question"
+                  placeholder="Type your question here..."
+                  rows="2"
+                  autoGrow="true"
+                ></ion-textarea>
+              </ion-item>
+            </div>
+
+            <div class="options-grid">
+              <div class="form-group" *ngFor="let opt of [1,2,3,4]; let idx = index">
+                <ion-item lines="none" class="modern-item option-item">
+                  <div class="option-prefix">{{ String.fromCharCode(65 + idx) }}</div>
+                  <ion-input
+                    [formControlName]="'option' + opt"
+                    [placeholder]="'Option ' + opt"
+                    type="text"
+                  ></ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <ion-item lines="none" class="modern-item select-item">
+                <ion-label>Correct Answer *</ion-label>
+                <ion-select formControlName="correctAnswer" interface="action-sheet">
+                  <ion-select-option value="1">A - Option 1</ion-select-option>
+                  <ion-select-option value="2">B - Option 2</ion-select-option>
+                  <ion-select-option value="3">C - Option 3</ion-select-option>
+                  <ion-select-option value="4">D - Option 4</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <div class="form-buttons">
+              <ion-button
+                expand="block"
+                color="success"
+                (click)="addQuestion()"
+                [disabled]="questionForm.invalid"
+              >
+                <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+                Add Question
+              </ion-button>
+              <ion-button
+                expand="block"
+                fill="outline"
+                color="medium"
+                (click)="showQuestionForm = false"
+              >
+                Cancel
+              </ion-button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Questions List -->
+        <div *ngIf="questions.length > 0" class="questions-list">
+          <div
+            *ngFor="let q of questions; let i = index"
+            class="question-card"
+          >
+            <div class="question-header">
+              <div class="question-number-badge">Q{{ i + 1 }}</div>
+              <div class="question-text">{{ q.question }}</div>
+            </div>
+            
+            <div class="question-options">
+              <div
+                *ngFor="let option of q.options; let optIndex = index"
+                class="option-item"
+                [class.correct-option]="optIndex === q.correctAnswer"
+              >
+                <div class="option-marker">{{ String.fromCharCode(65 + optIndex) }}</div>
+                <div class="option-content">
+                  <span class="option-text">{{ option }}</span>
+                  <ion-icon
+                    *ngIf="optIndex === q.correctAnswer"
+                    name="checkmark-circle"
+                    class="correct-icon"
+                  ></ion-icon>
+                </div>
+              </div>
+            </div>
+            
+            <div class="question-actions">
+              <ion-button
+                size="small"
+                fill="clear"
+                color="warning"
+                (click)="editQuestion(i)"
+              >
+                <ion-icon slot="icon-only" name="create"></ion-icon>
+              </ion-button>
+              <ion-button
+                size="small"
+                fill="clear"
+                color="danger"
+                (click)="removeQuestion(i)"
+              >
+                <ion-icon slot="icon-only" name="trash"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="questions.length === 0 && !showQuestionForm" class="empty-state">
+          <div class="empty-icon">🤔</div>
+          <p class="empty-title">No questions yet</p>
+          <p class="empty-subtitle">Click the button above to add your first question</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sticky Action Buttons -->
+    <div class="sticky-footer">
+      <div class="action-buttons">
+        <ion-button
+          expand="block"
+          color="success"
+          size="large"
+          (click)="submitQuiz()"
+          [disabled]="quizForm.invalid || questions.length < 3"
+          class="submit-btn"
+        >
+          <ion-icon slot="start" name="rocket"></ion-icon>
+          Create Quiz
+        </ion-button>
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="medium"
+          size="large"
+          (click)="cancel()"
+        >
+          Cancel
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,27 +1,142 @@
-#container {
+  ion-header {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  ion-toolbar {
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    --min-height: 60px;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .title-icon {
+    font-size: 24px;
+    color: white;
+  }
+
+  .title-text {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: white;
+  }
+
+  ion-buttons ion-button {
+    --color: white;
+  }
+
+  ion-icon {
+    font-size: 24px;
+  }
+
+  /* Progress bar styling */
+  .progress-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  }
+
+  /* Animation for progress bar */
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  .progress-fill {
+    animation: pulse 2s infinite;
+  }
+
+.home-content {
+  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.home-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.welcome-section {
   text-align: center;
+  color: white;
+  padding: 30px 0;
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  h1 {
+    font-size: 32px;
+    margin: 0;
+    font-weight: bold;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+  }
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .action-btn {
+    height: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.stats-section {
+  margin-top: 20px;
 
-  color: #8c8c8c;
+  ion-card {
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
-  margin: 0;
-}
+    ion-card-content {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+    }
 
-#container a {
-  text-decoration: none;
+    .stat-item {
+      text-align: center;
+      flex: 1;
+
+      .stat-number {
+        display: block;
+        font-size: 32px;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+      }
+    }
+  }
 }

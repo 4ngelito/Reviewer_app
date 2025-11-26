@@ -1,0 +1,472 @@
+  ion-header {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  ion-toolbar {
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    --min-height: 60px;
+  }
+
+ 
+.create-quiz-content {
+    --background: #f5f7fa;
+  }
+
+  .create-quiz-container {
+    padding-bottom: 140px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* Progress Section */
+  .progress-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .progress-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  .progress-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #adb5bd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: all 0.3s ease;
+  }
+
+  .progress-item.active .progress-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .progress-item span {
+    font-size: 11px;
+    color: #6c757d;
+    font-weight: 600;
+  }
+
+  .progress-item.active span {
+    color: #667eea;
+  }
+
+  .progress-line {
+    height: 3px;
+    flex: 1;
+    background: #e9ecef;
+    margin: 0 8px;
+    transition: all 0.3s ease;
+  }
+
+  .progress-line.active {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  }
+
+  /* Modern Card Styles */
+  .modern-card {
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .modern-card ion-card-header {
+    padding: 24px 20px 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  }
+
+  .card-header-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .modern-card ion-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 4px;
+  }
+
+  .modern-card ion-card-subtitle {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 400;
+  }
+
+  /* Form Styles */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .modern-item {
+    --background: #f8f9fa;
+    --border-radius: 12px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --inner-padding-end: 0;
+    border-radius: 12px;
+    margin-bottom: 0;
+  }
+
+  .modern-item ion-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #495057;
+  }
+
+  .modern-item ion-input,
+  .modern-item ion-textarea {
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+  }
+
+  /* Questions Header */
+  .questions-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .question-count-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .question-count-badge .count {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* Add Question Button */
+  .add-question-btn {
+    --background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --border-radius: 12px;
+    height: 52px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+  }
+
+  /* Question Form */
+  .question-form {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .form-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #212529;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .option-item {
+    position: relative;
+  }
+
+  .option-prefix {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    z-index: 10;
+  }
+
+  .option-item ion-input {
+    --padding-start: 52px;
+  }
+
+  .select-item {
+    --background: white;
+  }
+
+  .form-buttons {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .form-buttons ion-button {
+    --border-radius: 12px;
+    height: 48px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  /* Questions List */
+  .questions-list {
+    display: grid;
+    gap: 16px;
+  }
+
+  .question-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+
+  .question-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+
+  .question-header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .question-number-badge {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .question-text {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.5;
+    padding-top: 8px;
+  }
+
+  .question-options {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .option-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .option-item.correct-option {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 2px solid #28a745;
+  }
+
+  .option-marker {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #dee2e6;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .correct-option .option-marker {
+    background: #28a745;
+    color: white;
+  }
+
+  .option-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .option-text {
+    font-size: 14px;
+    color: #495057;
+    line-height: 1.4;
+  }
+
+  .correct-option .option-text {
+    color: #155724;
+    font-weight: 600;
+  }
+
+  .correct-icon {
+    color: #28a745;
+    font-size: 20px;
+  }
+
+  .question-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .question-actions ion-button {
+    margin: 0;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+  }
+
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+
+  .empty-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #495057;
+    margin: 0 0 8px 0;
+  }
+
+  .empty-subtitle {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0;
+  }
+
+  /* Sticky Footer */
+  .sticky-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 16px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+
+  .action-buttons {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    gap: 12px;
+  }
+
+  .submit-btn {
+    --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    margin: 0;
+  }
+
+  .action-buttons ion-button {
+    --border-radius: 12px;
+    height: 52px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  /* Responsive Design */
+  @media (min-width: 768px) {
+    .create-quiz-container {
+      padding: 24px;
+    }
+
+    .progress-section {
+      padding: 24px 32px;
+    }
+
+    .options-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-buttons {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sticky-footer {
+      padding: 20px 24px;
+    }
+
+    .action-buttons {
+      grid-template-columns: 1fr auto;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .progress-item span {
+      font-size: 10px;
+    }
+
+    .progress-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+    }
+
+    .question-number-badge {
+      width: 36px;
+      height: 36px;
+      font-size: 12px;
+    }
+  }

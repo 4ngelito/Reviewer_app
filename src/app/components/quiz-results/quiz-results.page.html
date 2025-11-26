@@ -1,0 +1,598 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Quiz Results</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner></ion-spinner>
+    <p>Loading results...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!isLoading && allResults.length === 0 && !showResultDetails"
+    class="empty-state"
+  >
+    <ion-icon name="document-outline"></ion-icon>
+    <p>No quiz results yet</p>
+    <p class="subtitle">Take a quiz to see your results here</p>
+    <ion-button expand="block" color="primary" (click)="goToQuizList()">
+      <ion-icon slot="start" name="play-circle"></ion-icon>
+      Take a Quiz
+    </ion-button>
+  </div>
+
+  <!-- Results List -->
+<div *ngIf="!isLoading && !showResultDetails" class="results-container">
+  <div class="results-header">
+    <h2>Your Quiz History</h2>
+    <p class="results-subtitle">Track your progress and review past attempts</p>
+  </div>
+
+  <div class="results-grid">
+    <div *ngFor="let result of allResults" class="result-card-wrapper">
+      <ion-card class="result-card" (click)="selectResult(result)">
+        <!-- Score Circle with Gradient -->
+        <div class="score-circle" [ngClass]="'score-' + getResultColor(result.percentage)">
+          <div class="circle-content">
+            <div class="percentage">{{ result.percentage }}<span class="percent-sign">%</span></div>
+            <div class="grade">{{ getResultMessage(result.percentage) }}</div>
+          </div>
+          <svg class="circle-progress" viewBox="0 0 120 120">
+            <circle class="circle-bg" cx="60" cy="60" r="54"></circle>
+            <circle 
+              class="circle-fill" 
+              cx="60" 
+              cy="60" 
+              r="54"
+              [style.strokeDashoffset]="339 - (339 * result.percentage / 100)"
+              [ngClass]="'stroke-' + getResultColor(result.percentage)"
+            ></circle>
+          </svg>
+        </div>
+
+        <!-- Card Content -->
+        <ion-card-header>
+          <div class="card-header-content">
+            
+            <ion-card-title class="quiz-title">
+              <ion-icon name="document-text-outline"></ion-icon>
+              {{ result.quizTitle }}
+            </ion-card-title>
+            <ion-badge [color]="getResultColor(result.percentage)" class="status-badge">
+              {{ getResultMessage(result.percentage) }}
+            </ion-badge>
+
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <!-- Stats Row -->
+          <div class="stats-row">
+            <div class="stat-item">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <div class="stat-content">
+                <span class="stat-label">Correct</span>
+                <span class="stat-value">{{ result.score }}</span>
+              </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <ion-icon name="help-circle-outline"></ion-icon>
+              <div class="stat-content">
+                <span class="stat-label">Total</span>
+                <span class="stat-value">{{ result.totalQuestions }}</span>
+              </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <ion-icon name="time-outline"></ion-icon>
+              <div class="stat-content">
+                <span class="stat-label">Date</span>
+                <span class="stat-value date">{{ result.completedAt | date : 'MMM d' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- View Details Button -->
+          <div class="card-footer">
+            <ion-button fill="clear" size="small" class="view-details-btn">
+              <span>View Details</span>
+              <ion-icon slot="end" name="chevron-forward"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+
+        <!-- Decorative Corner -->
+        <div class="card-corner" [ngClass]="'corner-' + getResultColor(result.percentage)"></div>
+      </ion-card>
+    </div>
+  </div>
+
+  <!-- Empty State (if no results) -->
+  <!-- <div *ngIf="allResults.length === 0" class="empty-state">
+    <ion-icon name="file-tray-outline"></ion-icon>
+    <h3>No Quiz Results Yet</h3>
+    <p>Complete a quiz to see your results here</p>
+  </div> -->
+</div>
+
+<style>
+  /* Container Styles */
+  .results-container {
+    padding: 24px 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header */
+  .results-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .results-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .results-subtitle {
+    font-size: 15px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+
+  /* Results Grid */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  /* Card Wrapper */
+  .result-card-wrapper {
+    animation: slideUp 0.5s ease backwards;
+  }
+
+  .result-card-wrapper:nth-child(1) { animation-delay: 0.1s; }
+  .result-card-wrapper:nth-child(2) { animation-delay: 0.2s; }
+  .result-card-wrapper:nth-child(3) { animation-delay: 0.3s; }
+  .result-card-wrapper:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Result Card */
+  .result-card {
+    position: relative;
+    margin: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ion-color-primary), var(--ion-color-primary-tint));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .result-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .result-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .result-card:active {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  /* Score Circle */
+  .score-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: -20px auto 16px;
+    z-index: 10;
+  }
+
+  .circle-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 2;
+  }
+
+  .percentage {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--ion-color-dark);
+  }
+
+  .percent-sign {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .grade {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  .circle-progress {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .circle-bg {
+    fill: none;
+    stroke: #e9ecef;
+    stroke-width: 8;
+  }
+
+  .circle-fill {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 339;
+    transition: stroke-dashoffset 1s ease-in-out;
+  }
+
+  /* Score Colors */
+  .score-success .percentage,
+  .score-success .grade { color: var(--ion-color-success); }
+  .stroke-success { stroke: var(--ion-color-success); }
+
+  .score-warning .percentage,
+  .score-warning .grade { color: var(--ion-color-warning); }
+  .stroke-warning { stroke: var(--ion-color-warning); }
+
+  .score-danger .percentage,
+  .score-danger .grade { color: var(--ion-color-danger); }
+  .stroke-danger { stroke: var(--ion-color-danger); }
+
+  .score-medium .percentage,
+  .score-medium .grade { color: var(--ion-color-medium); }
+  .stroke-medium { stroke: var(--ion-color-medium); }
+
+  /* Card Header */
+  .result-card ion-card-header {
+    padding: 0 20px 16px;
+  }
+
+  .card-header-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .quiz-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .quiz-title ion-icon {
+    font-size: 22px;
+    color: var(--ion-color-primary);
+    flex-shrink: 0;
+  }
+
+  .status-badge {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 6px;
+    --padding-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Card Content */
+  .result-card ion-card-content {
+    padding: 0 20px 20px;
+  }
+
+  /* Stats Row */
+  .stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: rgba(var(--ion-color-primary-rgb), 0.04);
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .stat-item ion-icon {
+    font-size: 24px;
+    color: var(--ion-color-primary);
+    flex-shrink: 0;
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+  }
+
+  .stat-value.date {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .stat-divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(var(--ion-color-medium-rgb), 0.2);
+  }
+
+  /* Card Footer */
+  .card-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .view-details-btn {
+    --color: var(--ion-color-primary);
+    --padding-start: 0;
+    --padding-end: 0;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: none;
+    letter-spacing: 0.3px;
+    margin: 0;
+  }
+
+  .view-details-btn ion-icon {
+    margin-left: 4px;
+    transition: transform 0.3s ease;
+  }
+
+  .result-card:hover .view-details-btn ion-icon {
+    transform: translateX(4px);
+  }
+
+  /* Decorative Corner */
+  .card-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 50px 50px 0;
+    opacity: 0.1;
+  }
+
+  .corner-success { border-color: transparent var(--ion-color-success) transparent transparent; }
+  .corner-warning { border-color: transparent var(--ion-color-warning) transparent transparent; }
+  .corner-danger { border-color: transparent var(--ion-color-danger) transparent transparent; }
+  .corner-medium { border-color: transparent var(--ion-color-medium) transparent transparent; }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .empty-state ion-icon {
+    font-size: 80px;
+    color: var(--ion-color-medium);
+    opacity: 0.3;
+    margin-bottom: 16px;
+  }
+
+  .empty-state h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 8px 0;
+  }
+
+  .empty-state p {
+    font-size: 15px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .results-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .results-header h2 {
+      font-size: 24px;
+    }
+
+    .stat-item {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 4px;
+    }
+
+    .stat-content {
+      align-items: center;
+    }
+
+    .stat-divider {
+      height: 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-row {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stat-item {
+      width: 100%;
+      flex-direction: row;
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .stat-content {
+      align-items: flex-start;
+    }
+
+    .stat-divider {
+      display: none;
+    }
+  }
+</style>
+
+  <!-- Result Details Modal -->
+  <div *ngIf="showResultDetails && selectedResult" class="result-details-modal">
+    <div class="result-details-container">
+      <!-- Close Button -->
+      <div class="close-button">
+        <ion-button fill="clear" (click)="closeResultDetails()">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Result Header -->
+      <div class="result-header">
+        <ion-icon
+          [name]="getGradeIcon(selectedResult.percentage)"
+          class="grade-icon"
+          [color]="getResultColor(selectedResult.percentage)"
+        ></ion-icon>
+        <h1>{{ selectedResult.quizTitle }}</h1>
+        <p class="result-message">
+          {{ getResultMessage(selectedResult.percentage) }}
+        </p>
+      </div>
+
+      <!-- Score Circle -->
+      <div class="score-circle-container">
+        <div
+          class="score-circle"
+          [ngClass]="'color-' + getResultColor(selectedResult.percentage)"
+          [style]="'--percentage: ' + (selectedResult.percentage / 100)"
+        >
+          <div class="score-value">
+            <span class="percentage">{{ selectedResult.percentage }}%</span>
+            <span class="fraction">
+              {{ selectedResult.score }}/{{ selectedResult.totalQuestions }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Stats -->
+      <ion-card class="stats-card">
+        <ion-card-content>
+          <div class="stat-row">
+            <span class="stat-label">Correct Answers:</span>
+            <span class="stat-value correct">{{ selectedResult.score }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Wrong Answers:</span>
+            <span class="stat-value wrong">
+              {{ selectedResult.totalQuestions - selectedResult.score }}
+            </span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Total Questions:</span>
+            <span class="stat-value">{{ selectedResult.totalQuestions }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Completed At:</span>
+            <span class="stat-value">
+              {{ selectedResult.completedAt | date : 'short' }}
+            </span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <ion-button expand="block" color="primary" (click)="goToQuizList()">
+          <ion-icon slot="start" name="play-circle"></ion-icon>
+          Take Another Quiz
+        </ion-button>
+        <ion-button expand="block" color="medium" (click)="goHome()">
+          <ion-icon slot="start" name="home"></ion-icon>
+          Home
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

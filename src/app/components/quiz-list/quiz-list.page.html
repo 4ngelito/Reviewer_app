@@ -1,0 +1,133 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Available Quizzes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refreshQuizzes()" [disabled]="isLoading">
+        <ion-icon slot="icon-only" name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="quiz-content">
+  <div class="content-wrapper">
+    
+    <!-- Header Stats Section -->
+    <div class="stats-header" *ngIf="!isLoading && filteredQuizzes.length > 0">
+      <div class="stat-card">
+        <ion-icon name="book"></ion-icon>
+        <div>
+          <h3>{{ filteredQuizzes.length }}</h3>
+          <p>Available Quizzes</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+      <ion-searchbar
+        mode="md"
+        placeholder="Search quizzes..."
+        (ionInput)="searchQuizzes($event)"
+        [value]="searchQuery"
+        animated="true"
+        showClearButton="always"
+      ></ion-searchbar>
+    </div>
+
+
+    <!-- Spinner for loading -->
+    <div *ngIf="isLoading" class="loading-spinner">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Loading quizzes...</p>
+    </div>
+
+    <!-- Quiz List -->
+    <div class="quiz-list-container" *ngIf="!isLoading">
+      <!-- Empty State -->
+      <div *ngIf="filteredQuizzes.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <ion-icon name="school-outline"></ion-icon>
+        </div>
+        <h2>{{ searchQuery ? 'No Results Found' : 'No Quizzes Yet' }}</h2>
+        <p>
+          {{
+            searchQuery
+              ? 'Try adjusting your search terms'
+              : 'Create your first quiz to get started on your learning journey!'
+          }}
+        </p>
+        <ion-button 
+          expand="block" 
+          color="primary" 
+          routerLink="/create-quiz"
+          class="create-btn"
+        >
+          <ion-icon slot="start" name="add-circle"></ion-icon>
+          Create First Quiz
+        </ion-button>
+      </div>
+
+      <!-- Quiz Cards -->
+      <div class="quiz-grid">
+        <ion-card 
+          *ngFor="let quiz of filteredQuizzes" 
+          class="quiz-card"
+          button="true"
+        >
+          <div class="card-badge">
+            <ion-badge color="primary">
+              {{ quiz.questions.length }} Questions
+            </ion-badge>
+          </div>
+          
+          <ion-card-header>
+            <ion-card-title>{{ quiz.title }}</ion-card-title>
+            <ion-card-subtitle>
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ (quiz.createdAt | date : 'MMM d, y') || 'Recently' }}
+            </ion-card-subtitle>
+          </ion-card-header>
+          
+          <ion-card-content>
+            <p class="description">{{ quiz.description }}</p>
+            
+            <div class="quiz-meta">
+              <div class="meta-item">
+                <ion-icon name="help-circle-outline"></ion-icon>
+                <span>{{ quiz.questions.length }} Questions</span>
+              </div>
+              <div class="meta-item">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>~{{ quiz.questions.length * 2 }} min</span>
+              </div>
+            </div>
+          </ion-card-content>
+          
+          <div class="card-footer">
+            <ion-button
+              expand="block"
+              color="success"
+              (click)="startQuiz(quiz)"
+              class="start-btn"
+            >
+              <ion-icon slot="start" name="play-circle"></ion-icon>
+              Start Quiz
+            </ion-button>
+          </div>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!isLoading">
+      <ion-fab-button color="primary" routerLink="/create-quiz">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+</ion-content>
+

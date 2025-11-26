@@ -1,0 +1,122 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/quiz-list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Quiz</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="quiz-content">
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner></ion-spinner>
+    <p>Loading quiz...</p>
+  </div>
+
+  <div *ngIf="!isLoading && quiz" class="quiz-container">
+    <!-- Quiz Header -->
+    <div class="quiz-header">
+      <h1>{{ quiz.title }}</h1>
+      <p>{{ quiz.description }}</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-info">
+        <span class="question-counter">
+          Question {{ currentQuestionIndex + 1 }} of {{ quiz.questions.length }}
+        </span>
+        <span class="progress-percentage">
+          {{ getProgressPercentage() | number : '1.0-0' }}%
+        </span>
+      </div>
+      <ion-progress-bar
+        [value]="getProgressPercentage() / 100"
+        color="success"
+      ></ion-progress-bar>
+    </div>
+
+    <!-- Current Question -->
+    <div class="question-section" *ngIf="getCurrentQuestion() as question">
+      <!-- Question Card -->
+      <ion-card class="question-card">
+        <ion-card-header>
+          <ion-card-title class="question-number">
+            Question {{ currentQuestionIndex + 1 }}
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p class="question-text">{{ question.question }}</p>
+
+          <!-- Options -->
+          <div class="options-container">
+            <div
+              *ngFor="let option of question.options; let i = index"
+              class="option-item"
+              (click)="selectAnswer(i)"
+              [class.selected]="isAnswerSelected(i)"
+            >
+              <div class="option-marker">
+                {{ String.fromCharCode(65 + i) }}
+              </div>
+              <div class="option-content">
+                <p class="option-text">{{ option }}</p>
+              </div>
+              <ion-icon
+                *ngIf="isAnswerSelected(i)"
+                name="checkmark-circle"
+                class="selected-icon"
+              ></ion-icon>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Question Indicator Dots -->
+      <div class="question-indicators">
+        <div
+          *ngFor="let q of quiz.questions; let i = index"
+          class="dot"
+          [class.active]="i === currentQuestionIndex"
+          [class.answered]="userAnswers[i] !== -1"
+          (click)="currentQuestionIndex = i"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+      <ion-button
+        [disabled]="currentQuestionIndex === 0"
+        expand="block"
+        fill="outline"
+        color="medium"
+        (click)="previousQuestion()"
+      >
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        Previous
+      </ion-button>
+
+      <ion-button
+        *ngIf="currentQuestionIndex < quiz.questions.length - 1"
+        expand="block"
+        fill="outline"
+        color="primary"
+        (click)="nextQuestion()"
+      >
+        Next
+        <ion-icon slot="end" name="chevron-forward"></ion-icon>
+      </ion-button>
+
+      <ion-button
+        *ngIf="currentQuestionIndex === quiz.questions.length - 1"
+        expand="block"
+        color="success"
+        (click)="submitQuiz()"
+      >
+        <ion-icon slot="start" name="checkmark-done"></ion-icon>
+        Submit Quiz
+      </ion-button>
+    </div>
+  </div>
+</ion-content>
