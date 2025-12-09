@@ -9,8 +9,8 @@
   }
 
  
-.create-quiz-content {
-    --background: #f5f7fa;
+  .create-quiz-content {
+    --background: var(--app-background);
   }
 
   .create-quiz-container {
@@ -83,7 +83,6 @@
   /* Modern Card Styles */
   .modern-card {
     border-radius: 20px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     margin-bottom: 20px;
     overflow: hidden;
   }

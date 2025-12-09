@@ -15,59 +15,92 @@
 
   <div *ngIf="!isLoading && quiz" class="quiz-container">
     <!-- Quiz Header -->
-    <div class="quiz-header">
-      <h1>{{ quiz.title }}</h1>
-      <p>{{ quiz.description }}</p>
+    <div class="quiz-header app-card">
+      <div class="quiz-header-inner">
+        <div class="quiz-title">
+          <h1>{{ quiz.title }}</h1>
+          <p class="muted">{{ quiz.description }}</p>
+        </div>
+        <div class="quiz-meta">
+          <div class="meta-item">
+            <ion-icon name="time-outline"></ion-icon>
+            <span class="muted">{{ quiz.questions.length }} questions</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Progress Bar -->
     <div class="progress-section">
-      <div class="progress-info">
-        <span class="question-counter">
-          Question {{ currentQuestionIndex + 1 }} of {{ quiz.questions.length }}
-        </span>
-        <span class="progress-percentage">
-          {{ getProgressPercentage() | number : '1.0-0' }}%
-        </span>
+      <div class="progress-top">
+        <div class="question-counter">Q {{ currentQuestionIndex + 1 }} / {{ quiz.questions.length }}</div>
+        <div class="progress-percentage">{{ getProgressPercentage() | number : '1.0-0' }}%</div>
       </div>
-      <ion-progress-bar
-        [value]="getProgressPercentage() / 100"
-        color="success"
-      ></ion-progress-bar>
+      <ion-progress-bar class="nice-progress" [value]="getProgressPercentage() / 100" color="primary"></ion-progress-bar>
     </div>
 
     <!-- Current Question -->
     <div class="question-section" *ngIf="getCurrentQuestion() as question">
       <!-- Question Card -->
-      <ion-card class="question-card">
-        <ion-card-header>
-          <ion-card-title class="question-number">
-            Question {{ currentQuestionIndex + 1 }}
-          </ion-card-title>
-        </ion-card-header>
+      <ion-card class="question-card app-card">
         <ion-card-content>
-          <p class="question-text">{{ question.question }}</p>
-
-          <!-- Options -->
-          <div class="options-container">
-            <div
-              *ngFor="let option of question.options; let i = index"
-              class="option-item"
-              (click)="selectAnswer(i)"
-              [class.selected]="isAnswerSelected(i)"
-            >
-              <div class="option-marker">
-                {{ String.fromCharCode(65 + i) }}
-              </div>
-              <div class="option-content">
-                <p class="option-text">{{ option }}</p>
-              </div>
-              <ion-icon
-                *ngIf="isAnswerSelected(i)"
-                name="checkmark-circle"
-                class="selected-icon"
-              ></ion-icon>
+          <div class="question-top">
+            <div class="question-number-big">{{ currentQuestionIndex + 1 }}</div>
+            <div class="question-body">
+              <div class="question-label muted">Question</div>
+              <div class="question-text">{{ question.question }}</div>
             </div>
+          </div>
+
+          <!-- Options / Inputs depending on question type -->
+          <div class="options-container new-options">
+            <!-- Multiple choice or true/false -->
+            <ng-container *ngIf="(question.type || quiz.type) === 'multiple-choice' || (question.type || quiz.type) === 'true-false'">
+              <div
+                *ngFor="let option of question.options; let i = index"
+                class="option-item"
+                (click)="selectAnswer(i)"
+                [class.selected]="isAnswerSelected(i)"
+              >
+                <div class="option-marker">
+                  <ng-container *ngIf="(question.type || quiz.type) === 'true-false'">
+                    {{ i === 0 ? 'T' : 'F' }}
+                  </ng-container>
+                  <ng-container *ngIf="(question.type || quiz.type) !== 'true-false'">
+                    {{ String.fromCharCode(65 + i) }}
+                  </ng-container>
+                </div>
+                <div class="option-content">
+                  <p class="option-text">{{ option }}</p>
+                </div>
+                <div class="option-check">
+                  <ion-icon *ngIf="isAnswerSelected(i)" name="checkmark-circle"></ion-icon>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Identification / Fill in the blank -->
+            <ng-container *ngIf="(question.type || quiz.type) === 'identification' || (question.type || quiz.type) === 'fill-in-blank'">
+              <ion-item lines="none" class="modern-item input-item">
+                <ion-input
+                  placeholder="Type your answer here"
+                  [value]="userAnswers[currentQuestionIndex] || ''"
+                  (ionInput)="setTextAnswer($any($event.target).value)"
+                ></ion-input>
+              </ion-item>
+            </ng-container>
+
+            <!-- Enumeration -->
+            <ng-container *ngIf="(question.type || quiz.type) === 'enumeration'">
+              <ion-item lines="none" class="modern-item input-item">
+                <ion-textarea
+                  placeholder="Enter answers, comma separated"
+                  [value]="(userAnswers[currentQuestionIndex] || []).join(', ')"
+                  (ionInput)="setEnumerationAnswer($any($event.target).value)"
+                  rows="2"
+                ></ion-textarea>
+              </ion-item>
+            </ng-container>
           </div>
         </ion-card-content>
       </ion-card>

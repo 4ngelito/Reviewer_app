@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoadingController, ToastController, IonicModule } from '@ionic/angular';
+import { LoadingController, ToastController, IonicModule, AlertController } from '@ionic/angular';
 import { QuizService } from '../../services/quiz';
 import { Quiz } from '../../models/quiz';
 import { CommonModule } from '@angular/common';
@@ -24,7 +24,39 @@ export class QuizListPage implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private toastController: ToastController
+    , private alertController: AlertController
   ) {}
+
+  async confirmDelete(quizId: number): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Delete Quiz',
+      message: 'Are you sure you want to delete this quiz? This action cannot be undone.',
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Delete',
+          cssClass: 'danger',
+          handler: () => {
+            this.deleteQuiz(quizId);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  deleteQuiz(quizId: number): void {
+    this.quizService.deleteQuiz(quizId).subscribe(
+      () => {
+        this.showToast('Quiz deleted');
+        this.loadQuizzes();
+      },
+      (err) => {
+        console.error('Error deleting quiz', err);
+        this.showToast('Failed to delete quiz');
+      }
+    );
+  }
 
   ngOnInit(): void {
     this.loadQuizzes();

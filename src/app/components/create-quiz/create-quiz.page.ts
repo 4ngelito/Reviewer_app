@@ -32,19 +32,83 @@ export class CreateQuizPage implements OnInit {
     this.quizForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
+      type: ['multiple-choice', Validators.required]
     });
 
     this.questionForm = this.formBuilder.group({
       question: ['', [Validators.required, Validators.minLength(5)]],
       option1: ['', Validators.required],
       option2: ['', Validators.required],
-      option3: ['', Validators.required],
-      option4: ['', Validators.required],
+      option3: [''],
+      option4: [''],
       correctAnswer: ['', Validators.required],
+      answerText: [''],
+      answerList: ['']
     });
   }
 
   ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    // Ensure validators reflect current quiz type when form is shown/changed
+    this.applyQuestionTypeValidators(this.quizForm.value.type || 'multiple-choice');
+
+    this.quizForm.get('type')?.valueChanges.subscribe((t) => {
+      this.applyQuestionTypeValidators(t);
+    });
+  }
+
+  private applyQuestionTypeValidators(type: string) {
+    const opt1 = this.questionForm.get('option1');
+    const opt2 = this.questionForm.get('option2');
+    const opt3 = this.questionForm.get('option3');
+    const opt4 = this.questionForm.get('option4');
+    const correct = this.questionForm.get('correctAnswer');
+    const answerText = this.questionForm.get('answerText');
+    const answerList = this.questionForm.get('answerList');
+
+    // clear validators first
+    opt1?.clearValidators();
+    opt2?.clearValidators();
+    opt3?.clearValidators();
+    opt4?.clearValidators();
+    correct?.clearValidators();
+    answerText?.clearValidators();
+    answerList?.clearValidators();
+
+    if (type === 'multiple-choice' || type === 'true-false') {
+      if (type === 'multiple-choice') {
+        // require all four options for multiple choice
+        opt1?.setValidators([Validators.required]);
+        opt2?.setValidators([Validators.required]);
+        opt3?.setValidators([Validators.required]);
+        opt4?.setValidators([Validators.required]);
+        correct?.setValidators([Validators.required]);
+      } else {
+        // true-false: we auto-fill the options and don't require user inputs
+        opt1?.clearValidators();
+        opt2?.clearValidators();
+        opt3?.clearValidators();
+        opt4?.clearValidators();
+        // set default values for TF options so the form is valid without user typing
+        this.questionForm.get('option1')?.setValue('True');
+        this.questionForm.get('option2')?.setValue('False');
+        correct?.setValidators([Validators.required]);
+      }
+    } else if (type === 'identification' || type === 'fill-in-blank') {
+      answerText?.setValidators([Validators.required, Validators.minLength(1)]);
+    } else if (type === 'enumeration') {
+      answerList?.setValidators([Validators.required, Validators.minLength(1)]);
+    }
+
+    opt1?.updateValueAndValidity();
+    opt2?.updateValueAndValidity();
+    opt3?.updateValueAndValidity();
+    opt4?.updateValueAndValidity();
+    correct?.updateValueAndValidity();
+    answerText?.updateValueAndValidity();
+    answerList?.updateValueAndValidity();
+  }
 
   addQuestion(): void {
     if (this.questionForm.invalid) {
@@ -53,30 +117,67 @@ export class CreateQuizPage implements OnInit {
     }
 
     const formValue = this.questionForm.value;
-    
-    // Convert correctAnswer to number and validate
-    const correctAnswerNum = Number(formValue.correctAnswer);
-    
-    if (isNaN(correctAnswerNum) || correctAnswerNum < 1 || correctAnswerNum > 4) {
-      this.showToast('Correct answer must be between 1 and 4');
+    const qType = this.quizForm.value.type || 'multiple-choice';
+
+    let newQuestion: Question;
+
+    if (qType === 'multiple-choice' || qType === 'true-false') {
+      const correctAnswerNum = Number(formValue.correctAnswer);
+      const maxOpt = qType === 'true-false' ? 2 : 4;
+      if (isNaN(correctAnswerNum) || correctAnswerNum < 1 || correctAnswerNum > maxOpt) {
+        this.showToast(`Correct answer must be between 1 and ${maxOpt}`);
+        return;
+      }
+      const options = qType === 'true-false'
+        ? ['True', 'False']
+        : [formValue.option1, formValue.option2, formValue.option3, formValue.option4];
+
+      newQuestion = {
+        id: Date.now(),
+        question: formValue.question,
+        options,
+        correctAnswer: correctAnswerNum - 1,
+        quizId: 0,
+        type: qType
+      } as Question;
+    } else if (qType === 'identification' || qType === 'fill-in-blank') {
+      const answer = (formValue.answerText || '').trim();
+      if (!answer) {
+        this.showToast('Please provide the correct answer');
+        return;
+      }
+
+      newQuestion = {
+        id: Date.now(),
+        question: formValue.question,
+        correctAnswer: answer,
+        quizId: 0,
+        type: qType
+      } as Question;
+    } else if (qType === 'enumeration') {
+      const list = (formValue.answerList || '').split(',').map((s: string) => s.trim()).filter((s: string) => s);
+      if (!list.length) {
+        this.showToast('Please provide at least one correct item (comma separated)');
+        return;
+      }
+
+      newQuestion = {
+        id: Date.now(),
+        question: formValue.question,
+        correctAnswers: list,
+        quizId: 0,
+        type: qType
+      } as Question;
+    } else {
+      this.showToast('Unsupported question type');
       return;
     }
 
-    const newQuestion: Question = {
-      id: this.questions.length + 1,
-      question: formValue.question,
-      options: [
-        formValue.option1,
-        formValue.option2,
-        formValue.option3,
-        formValue.option4,
-      ],
-      correctAnswer: correctAnswerNum - 1, // Convert to 0-based index
-      quizId: 0,
-    };
-
     this.questions.push(newQuestion);
+    // reset the question form safely
     this.questionForm.reset();
+    // clear option values
+    this.questionForm.patchValue({ option1: '', option2: '', option3: '', option4: '', correctAnswer: '' });
     this.showToast('Question added successfully');
   }
 
@@ -86,14 +187,23 @@ export class CreateQuizPage implements OnInit {
 
   editQuestion(index: number): void {
     const question = this.questions[index];
-    this.questionForm.patchValue({
-      question: question.question,
-      option1: question.options[0],
-      option2: question.options[1],
-      option3: question.options[2],
-      option4: question.options[3],
-      correctAnswer: String(question.correctAnswer + 1), // Convert back to 1-based
-    });
+    // populate form depending on question type
+    const qType = question.type || 'multiple-choice';
+    const patch: any = { question: question.question, type: qType };
+
+    if (qType === 'multiple-choice' || qType === 'true-false') {
+      patch.option1 = question.options?.[0] ?? '';
+      patch.option2 = question.options?.[1] ?? '';
+      patch.option3 = question.options?.[2] ?? '';
+      patch.option4 = question.options?.[3] ?? '';
+      patch.correctAnswer = question.correctAnswer !== undefined ? String(Number(question.correctAnswer) + 1) : '';
+    } else if (qType === 'identification' || qType === 'fill-in-blank') {
+      patch.answerText = typeof question.correctAnswer === 'string' ? question.correctAnswer : '';
+    } else if (qType === 'enumeration') {
+      patch.answerList = (question.correctAnswers || []).join(', ');
+    }
+
+    this.questionForm.patchValue(patch);
     this.removeQuestion(index);
     window.scrollTo(0, 0);
   }
@@ -117,9 +227,10 @@ export class CreateQuizPage implements OnInit {
     const quizData: Omit<Quiz, 'id'> = {
       title: this.quizForm.value.title,
       description: this.quizForm.value.description,
+      type: this.quizForm.value.type,
       questions: this.questions.map(q => ({
         ...q,
-        correctAnswer: Number(q.correctAnswer) // Ensure it's a number
+        correctAnswer: typeof q.correctAnswer !== 'undefined' ? Number(q.correctAnswer as any) : undefined // Ensure it's a number when present
       })),
       createdAt: new Date(),
     };

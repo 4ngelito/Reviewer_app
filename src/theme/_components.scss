@@ -1,0 +1,41 @@
+// Shared UI component styles
+
+/* Card */
+.app-card {
+  background: var(--app-surface);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-sm);
+  padding: 16px;
+}
+
+/* Button primary */
+.btn-primary {
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+  color: white;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 10px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(15,17,26,0.06);
+  color: var(--ion-color-dark);
+  border-radius: 10px;
+  padding: 9px 14px;
+}
+
+/* Small utilities */
+.center { text-align: center; }
+.muted { color: var(--ion-color-medium); }
+
+/* Form controls */
+.form-card {
+  background: var(--app-surface);
+  border-radius: var(--app-radius-md);
+  box-shadow: var(--app-shadow-sm);
+  padding: 14px;
+}

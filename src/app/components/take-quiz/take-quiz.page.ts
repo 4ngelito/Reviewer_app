@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
 export class TakeQuizPage implements OnInit {
   quiz: Quiz | null = null;
   currentQuestionIndex = 0;
-  userAnswers: number[] = [];
+  userAnswers: any[] = [];
   isQuizSubmitted = false;
   isLoading = false;
   String = String;
@@ -60,7 +60,8 @@ export class TakeQuizPage implements OnInit {
 
   initializeAnswers(): void {
     if (this.quiz) {
-      this.userAnswers = new Array(this.quiz.questions.length).fill(-1);
+      // initialize with nulls; each entry may be number, string, or string[] depending on question type
+      this.userAnswers = new Array(this.quiz.questions.length).fill(null);
     }
   }
 
@@ -72,8 +73,19 @@ export class TakeQuizPage implements OnInit {
     this.userAnswers[this.currentQuestionIndex] = optionIndex;
   }
 
+  // for binding in template
   isAnswerSelected(optionIndex: number): boolean {
     return this.userAnswers[this.currentQuestionIndex] === optionIndex;
+  }
+
+  setTextAnswer(value: string): void {
+    this.userAnswers[this.currentQuestionIndex] = value;
+  }
+
+  setEnumerationAnswer(value: string): void {
+    // store as array of trimmed strings
+    const list = value.split(',').map(s => s.trim()).filter(s => s.length);
+    this.userAnswers[this.currentQuestionIndex] = list;
   }
 
   nextQuestion(): void {
@@ -130,6 +142,7 @@ export class TakeQuizPage implements OnInit {
     });
     await loading.present();
 
+    // Build answers payload matching QuizService expectations
     const answers = this.userAnswers.map((answer, index) => ({
       questionId: this.quiz!.questions[index].id,
       answer,

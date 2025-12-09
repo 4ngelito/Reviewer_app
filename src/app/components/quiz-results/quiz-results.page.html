@@ -592,6 +592,10 @@
           <ion-icon slot="start" name="home"></ion-icon>
           Home
         </ion-button>
+        <ion-button expand="block" color="danger" (click)="confirmDeleteResult(selectedResult.id)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          Delete Result
+        </ion-button>
       </div>
     </div>
   </div>

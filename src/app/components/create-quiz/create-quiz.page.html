@@ -67,6 +67,19 @@
             </ion-item>
           </div>
 
+          <div class="form-group">
+            <ion-item lines="none" class="modern-item">
+              <ion-label position="stacked">Quiz Type</ion-label>
+              <ion-select formControlName="type">
+                <ion-select-option value="multiple-choice">Multiple Choice</ion-select-option>
+                <ion-select-option value="identification">Identification</ion-select-option>
+                <ion-select-option value="enumeration">Enumeration</ion-select-option>
+                <ion-select-option value="true-false">True / False</ion-select-option>
+                <ion-select-option value="fill-in-blank">Fill in the Blank</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+
         </form>
       </ion-card-content>
 
@@ -111,37 +124,72 @@
             <div class="form-group">
               <ion-item lines="none" class="modern-item">
                 <ion-label position="stacked">Question *</ion-label>
-                <ion-textarea
-                  formControlName="question"
-                  placeholder="Type your question here..."
-                  rows="2"
-                  autoGrow="true"
-                ></ion-textarea>
+                <ion-textarea formControlName="question" placeholder="Enter the question text" rows="3" autoGrow="true"></ion-textarea>
               </ion-item>
             </div>
 
-            <div class="options-grid">
-              <div class="form-group" *ngFor="let opt of [1,2,3,4]; let idx = index">
-                <ion-item lines="none" class="modern-item option-item">
-                  <div class="option-prefix">{{ String.fromCharCode(65 + idx) }}</div>
-                  <ion-input
-                    [formControlName]="'option' + opt"
-                    [placeholder]="'Option ' + opt"
-                    type="text"
-                  ></ion-input>
-                </ion-item>
-              </div>
-            </div>
+            <!-- Show options for Multiple Choice -->
+            <div *ngIf="quizForm.value.type === 'multiple-choice'" class="form-group options-grid">
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Option A *</ion-label>
+                <ion-input formControlName="option1" type="text" placeholder="Option A"></ion-input>
+              </ion-item>
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Option B *</ion-label>
+                <ion-input formControlName="option2" type="text" placeholder="Option B"></ion-input>
+              </ion-item>
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Option C *</ion-label>
+                <ion-input formControlName="option3" type="text" placeholder="Option C"></ion-input>
+              </ion-item>
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Option D *</ion-label>
+                <ion-input formControlName="option4" type="text" placeholder="Option D"></ion-input>
+              </ion-item>
 
-            <div class="form-group">
               <ion-item lines="none" class="modern-item select-item">
                 <ion-label>Correct Answer *</ion-label>
                 <ion-select formControlName="correctAnswer" interface="action-sheet">
-                  <ion-select-option value="1">A - Option 1</ion-select-option>
-                  <ion-select-option value="2">B - Option 2</ion-select-option>
-                  <ion-select-option value="3">C - Option 3</ion-select-option>
-                  <ion-select-option value="4">D - Option 4</ion-select-option>
+                  <ion-select-option value="1">A - Option A</ion-select-option>
+                  <ion-select-option value="2">B - Option B</ion-select-option>
+                  <ion-select-option value="3">C - Option C</ion-select-option>
+                  <ion-select-option value="4">D - Option D</ion-select-option>
                 </ion-select>
+              </ion-item>
+            </div>
+
+            <!-- Show options for True/False (auto-filled) -->
+            <div *ngIf="quizForm.value.type === 'true-false'" class="form-group">
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Options</ion-label>
+                <div class="tf-options">
+                  <ion-chip color="light"><ion-label>True</ion-label></ion-chip>
+                  <ion-chip color="light"><ion-label>False</ion-label></ion-chip>
+                </div>
+              </ion-item>
+
+              <ion-item lines="none" class="modern-item select-item">
+                <ion-label>Correct Answer *</ion-label>
+                <ion-select formControlName="correctAnswer" interface="action-sheet">
+                  <ion-select-option value="1">True</ion-select-option>
+                  <ion-select-option value="2">False</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <!-- Identification / Fill-in-the-blank -->
+            <div *ngIf="quizForm.value.type === 'identification' || quizForm.value.type === 'fill-in-blank'" class="form-group">
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Answer *</ion-label>
+                <ion-input formControlName="answerText" placeholder="Correct answer (text)" type="text"></ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Enumeration -->
+            <div *ngIf="quizForm.value.type === 'enumeration'" class="form-group">
+              <ion-item lines="none" class="modern-item">
+                <ion-label position="stacked">Accepted Answers *</ion-label>
+                <ion-textarea formControlName="answerList" placeholder="Comma separated answers (e.g., Red, Blue, Green)" rows="2"></ion-textarea>
               </ion-item>
             </div>
 
